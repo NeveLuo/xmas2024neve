@@ -37,7 +37,7 @@ function draw() {
     fill(255);
     textSize(22);
     textAlign(CENTER, CENTER);
-    text("CLICK TO START", width / 2, height / 2);
+    text("CLICK ANYWHERE TO START", width / 2, height / 2);
     return;
   }
 
@@ -70,8 +70,9 @@ function draw() {
 
 function mousePressed() {
   if (!programStarted) {
-    userStartAudio(); // 启动音频上下文
     programStarted = true;
+    userStartAudio(); // 确保音频上下文在用户交互后启动
+    backgroundMusic.setVolume(0.6);
     backgroundMusic.loop();
     return;
   }
@@ -94,6 +95,18 @@ function mousePressed() {
     }
 
     imagesLoaded = true;
+  }
+}
+
+function keyPressed() {
+  if (showPopup && userInput.length < 20 && keyCode !== SHIFT) {
+    if (keyCode === BACKSPACE) {
+      if (userInput.length > 0) {
+        userInput = userInput.slice(0, -1);
+      }
+    } else if (key.length === 1) {
+      userInput += key;
+    }
   }
 }
 
