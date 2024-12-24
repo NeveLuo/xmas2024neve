@@ -4,10 +4,10 @@ let snowflakesStopped = false;
 let musicSwitched = false;
 let imagesLoaded = false;
 let userInput = "";
-let startProgram = false;
 let backgroundMusic, newMusic;
 let image1, image2;
 let buttonX, buttonY, buttonWidth, buttonHeight;
+let programStarted = false;
 
 function preload() {
   backgroundMusic = loadSound('./assets/background_music.mp3');
@@ -32,7 +32,7 @@ function setup() {
 }
 
 function draw() {
-  if (!startProgram) {
+  if (!programStarted) {
     background(0);
     fill(255);
     textSize(22);
@@ -69,9 +69,9 @@ function draw() {
 }
 
 function mousePressed() {
-  if (!startProgram) {
-    startProgram = true;
-    userStartAudio();
+  if (!programStarted) {
+    userStartAudio(); // 启动音频上下文
+    programStarted = true;
     backgroundMusic.loop();
     return;
   }
