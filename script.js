@@ -65,8 +65,9 @@ function draw() {
 }
 
 function mousePressed() {
+  // 启动音频上下文
   if (!backgroundMusic.isPlaying()) {
-    userStartAudio(); // 启动音频上下文
+    userStartAudio();
     backgroundMusic.setVolume(0.6);
     backgroundMusic.loop();
   }
