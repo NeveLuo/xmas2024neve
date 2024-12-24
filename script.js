@@ -5,15 +5,32 @@ let musicSwitched = false; // 标志是否已经切换过背景音乐
 let backgroundMusic; // 当前播放的背景音乐
 let newMusic; // 新音乐
 let popupImage; // 弹窗图片
+let musicLoaded = false; // 标志背景音乐是否加载完成
 
 function preload() {
+  console.log("预加载开始");
+
   // 加载音乐文件
   soundFormats("mp3");
-  backgroundMusic = loadSound("./assets/background_music.mp3");
-  newMusic = loadSound("./assets/new_music.mp3");
+  backgroundMusic = loadSound("./assets/background_music.mp3", () => {
+    console.log("背景音乐加载完成");
+    musicLoaded = true;
+  }, (err) => {
+    console.error("背景音乐加载失败", err);
+  });
+
+  newMusic = loadSound("./assets/new_music.mp3", () => {
+    console.log("新背景音乐加载完成");
+  }, (err) => {
+    console.error("新背景音乐加载失败", err);
+  });
 
   // 加载弹窗图片
-  popupImage = loadImage("./assets/popup_image.jpg");
+  popupImage = loadImage("./assets/popup_image.jpg", () => {
+    console.log("弹窗图片加载完成");
+  }, (err) => {
+    console.error("弹窗图片加载失败", err);
+  });
 }
 
 function setup() {
@@ -26,12 +43,21 @@ function setup() {
     snowflakes.push(new PixelSnowflake(random(width), random(height)));
   }
 
-  // 设置背景音乐
-  backgroundMusic.setVolume(0.6); // 调低至 60%
-  backgroundMusic.loop();
+  console.log("setup 完成");
 }
 
 function draw() {
+  if (!musicLoaded) {
+    // 如果音乐未加载完成，显示加载信息
+    background(0);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    text("Loading...", width / 2, height / 2);
+    console.log("Loading...");
+    return; // 等待音乐加载完成
+  }
+
   drawGradientBackground(); // 绘制渐变背景
 
   // 更新和绘制雪花
@@ -56,18 +82,32 @@ function draw() {
 }
 
 function mousePressed() {
+  console.log("鼠标点击事件触发");
+
   // 一次点击同时关闭弹窗、停止雪花生成、清空雪花、切换背景音乐
   if (showPopup) {
     showPopup = false; // 关闭弹窗
     snowflakesStopped = true; // 停止生成雪花
     snowflakes = []; // 清空所有雪花
 
-    // 只允许切换一次背景音乐
+    // 播放背景音乐
+    if (backgroundMusic.isPlaying()) {
+      backgroundMusic.stop();
+    }
+
     if (!musicSwitched) {
       musicSwitched = true; // 标记为已切换
-      backgroundMusic.stop(); // 停止旧音乐
+      console.log("播放新背景音乐");
+      newMusic.setVolume(0.6);
       newMusic.play(); // 播放新音乐一次（非循环）
     }
+  }
+
+  // 如果旧背景音乐未播放，点击后播放
+  if (!backgroundMusic.isPlaying() && !musicSwitched) {
+    console.log("播放旧背景音乐");
+    backgroundMusic.setVolume(0.6); // 调低至 60%
+    backgroundMusic.loop(); // 循环播放旧背景音乐
   }
 }
 
